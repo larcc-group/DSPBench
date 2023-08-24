@@ -7,6 +7,7 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.streaming.DataStreamWriter;
 import org.apache.spark.sql.streaming.GroupStateTimeout;
 import org.apache.spark.sql.streaming.OutputMode;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.streaming.constants.ClickAnalyticsConstants;
@@ -57,6 +58,11 @@ public class MachineOutlier extends AbstractApplication {
                 .flatMap(new SSAlertTrigger(config), Encoders.kryo(Row.class));
 
         return createSink(alert);
+    }
+
+    @Override
+    public JavaStreamingContext buildApplicationStreaming() {
+        return null;
     }
 
     @Override

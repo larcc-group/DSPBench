@@ -11,6 +11,7 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.streaming.constants.ClickAnalyticsConstants;
@@ -101,6 +102,11 @@ public class LogProcessing extends AbstractApplication {
         geo.awaitTermination();
 
         return createSink();
+    }
+
+    @Override
+    public JavaStreamingContext buildApplicationStreaming() {
+        return null;
     }
 
     @Override

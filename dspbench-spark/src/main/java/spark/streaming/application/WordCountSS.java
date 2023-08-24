@@ -1,0 +1,91 @@
+package spark.streaming.application;
+
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.streaming.DataStreamWriter;
+import org.apache.spark.sql.streaming.GroupStateTimeout;
+import org.apache.spark.sql.streaming.StreamingQueryException;
+import org.apache.spark.streaming.Duration;
+import org.apache.spark.streaming.Durations;
+import org.apache.spark.streaming.api.java.JavaDStream;
+import org.apache.spark.streaming.api.java.JavaPairDStream;
+import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import scala.Tuple2;
+import spark.streaming.constants.WordCountConstants;
+import spark.streaming.function.SSFilterNull;
+import spark.streaming.function.SSWordCount;
+import spark.streaming.function.SSWordcountParser;
+import spark.streaming.function.Split;
+import spark.streaming.util.Configuration;
+import spark.streaming.util.Tuple;
+
+import java.util.Arrays;
+
+public class WordCountSS extends AbstractApplication {
+    private static final Logger LOG = LoggerFactory.getLogger(WordCountSS.class);
+
+    private int parserThreads;
+    private int splitterThreads;
+    private int singleCounterThreads;
+    private int pairCounterThreads;
+
+    public WordCountSS(String appName, Configuration config) {
+        super(appName, config);
+    }
+
+    @Override
+    public void initialize() {
+        splitterThreads = config.getInt(WordCountConstants.Config.SPLITTER_THREADS, 1);
+        singleCounterThreads = config.getInt(WordCountConstants.Config.SINGLE_COUNTER_THREADS, 1);
+        pairCounterThreads = config.getInt(WordCountConstants.Config.PAIR_COUNTER_THREADS, 1);
+        parserThreads = config.getInt(WordCountConstants.Config.PARSER_THREADS, 1);
+       // batchSize            = config.getInt(getConfigKey(Config.BATCH_SIZE), 1000);
+    }
+
+    @Override
+    public DataStreamWriter buildApplication() throws StreamingQueryException {
+        return null;
+    }
+
+    @Override
+    public JavaStreamingContext buildApplicationStreaming() {
+
+        context = new JavaStreamingContext(config, Durations.seconds(10)); //todo change for conf file
+
+        JavaDStream<String> lines  = createSourceSS();//context.socketTextStream("localhost", 9999);//
+
+        JavaDStream<String> words = lines.flatMap(x -> Arrays.asList(x.split(" ")).iterator());
+
+
+        JavaPairDStream<String, Integer> pairs = words.mapToPair(s -> new Tuple2<>(s, 1));
+
+
+        JavaPairDStream<String, Integer> wordCounts = pairs.reduceByKey((i1, i2) -> i1 + i2);
+
+        //wordCounts.print();
+
+        wordCounts.foreachRDD(rdd -> {
+            rdd.foreach(record -> {
+                System.out.println(record);
+       //         incReceived();
+            });
+        });
+
+        return context;
+    }
+
+    @Override
+    public String getConfigPrefix() {
+        return WordCountConstants.PREFIX;
+    }
+
+    @Override
+    public Logger getLogger() {
+        return LOG;
+    }
+}

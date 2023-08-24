@@ -7,6 +7,7 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.streaming.DataStreamWriter;
 import org.apache.spark.sql.streaming.GroupStateTimeout;
 import org.apache.spark.sql.streaming.OutputMode;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.streaming.constants.FraudDetectionConstants;
@@ -44,6 +45,11 @@ public class FraudDetection extends AbstractApplication {
                 .flatMapGroupsWithState(new SSFraudPred(config), OutputMode.Update(), Encoders.kryo(FraudRecord.class), Encoders.kryo(Row.class), GroupStateTimeout.NoTimeout());
 
         return createSink(predictors);
+    }
+
+    @Override
+    public JavaStreamingContext buildApplicationStreaming() {
+        return null;
     }
 
     @Override

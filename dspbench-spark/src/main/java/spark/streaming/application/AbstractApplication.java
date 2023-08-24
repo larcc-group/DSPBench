@@ -9,10 +9,13 @@ import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.streaming.DataStreamWriter;
 import org.apache.spark.sql.streaming.StreamingQuery;
 import org.apache.spark.sql.streaming.StreamingQueryException;
+import org.apache.spark.streaming.api.java.JavaDStream;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import spark.streaming.constants.BaseConstants.BaseConfig;
 import spark.streaming.sink.BaseSink;
 import spark.streaming.source.BaseSource;
+import spark.streaming.source.BaseSourceSS;
 import spark.streaming.util.ClassLoaderUtils;
 import spark.streaming.util.Configuration;
 
@@ -23,22 +26,23 @@ public abstract class AbstractApplication implements Serializable {
     protected String appName;
     protected Configuration config;
     protected transient SparkSession session;
+    protected transient JavaStreamingContext context;
 
     public AbstractApplication(String appName, Configuration config) {
         this.appName = appName;
         this.config = config;
-        this.session = SparkSession
+        /*this.session = SparkSession
                 .builder()
                 .config(config)
                 .getOrCreate();
 
-        this.session.sparkContext().setLogLevel("WARN");
+        this.session.sparkContext().setLogLevel("WARN");*/
     }
 
     public abstract void initialize();
 
     public abstract DataStreamWriter buildApplication() throws StreamingQueryException;
-
+    public abstract JavaStreamingContext buildApplicationStreaming();
     public abstract String getConfigPrefix();
 
     public abstract Logger getLogger();
@@ -53,6 +57,14 @@ public abstract class AbstractApplication implements Serializable {
         source.initialize(config, session, getConfigPrefix());
         return source.createStream();
     }
+
+    protected JavaDStream<String> createSourceSS() {
+        String sourceClass = config.get(getConfigKey(BaseConfig.SOURCE_CLASS));
+        BaseSourceSS source = (BaseSourceSS) ClassLoaderUtils.newInstance(sourceClass, "source", getLogger());
+        source.initialize(config, context, getConfigPrefix());
+        return source.createStream();
+    }
+
 
     protected DataStreamWriter<Row> createSink(Dataset<Row> dt) {
         String sinkClass = config.get(getConfigKey(BaseConfig.SINK_CLASS), "spark.streaming.sink.ConsoleSink");
