@@ -1,5 +1,6 @@
 package spark.streaming.application;
 
+import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -11,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import spark.streaming.constants.WordCountConstants;
 import spark.streaming.function.*;
 import spark.streaming.util.Configuration;
+
+import java.util.Arrays;
 
 public class WordCount extends AbstractApplication {
     private static final Logger LOG = LoggerFactory.getLogger(WordCount.class);
@@ -37,18 +40,11 @@ public class WordCount extends AbstractApplication {
 
         Dataset<Row> lines = createSource();
 
-        Dataset<Row> records = lines.repartition(parserThreads)
+        Dataset<String> words = lines.repartition(splitterThreads)
                 .as(Encoders.STRING())
-                .map(new SSWordcountParser(config), Encoders.kryo(Row.class));
+                .flatMap((FlatMapFunction<String, String>) x -> Arrays.asList(x.split(" ")).iterator(), Encoders.STRING());
 
-        Dataset<Row> words = records.repartition(splitterThreads)
-                .filter(new SSFilterNull<>())
-                .flatMap(new Split(config),  Encoders.kryo(Row.class));
-
-        Dataset<Row> wordCounts = words
-                .repartition(pairCounterThreads)
-                .groupByKey((MapFunction<Row, String>) row -> row.getString(0), Encoders.STRING())
-                .mapGroupsWithState(new SSWordCount(config), Encoders.LONG(), Encoders.kryo(Row.class), GroupStateTimeout.NoTimeout());
+        Dataset<Row> wordCounts = words.repartition(pairCounterThreads).groupBy("value").count();
 
         return createSink(wordCounts);
     }
