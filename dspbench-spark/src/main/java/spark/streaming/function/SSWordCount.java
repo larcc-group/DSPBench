@@ -48,8 +48,8 @@ public class SSWordCount extends BaseFunction implements MapGroupsWithStateFunct
             count++;
             state.update(count);
 
-            Calculate();
-            incBoth();
+         //   Calculate();
+          //  incBoth();
         }
         return RowFactory.create(key, count);
     }

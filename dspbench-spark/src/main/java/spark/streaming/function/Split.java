@@ -36,15 +36,15 @@ public class Split extends BaseFunction implements FlatMapFunction<Row, Row> {
 
     @Override
     public Iterator<Row> call(Row s) throws Exception {
-        incReceived();
-        Calculate();
+      //  incReceived();
+      //  Calculate();
         String[] words = s.getString(0).split("\\W");
         List<Row> tuples = new ArrayList<>();
 
         for (String word : words) {
             if (!StringUtils.isBlank(word)){
                 tuples.add(RowFactory.create(word));
-                incEmitted();
+            //    incEmitted();
             }
         }
         return tuples.iterator();
