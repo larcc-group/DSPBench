@@ -21,7 +21,7 @@ public class FileSourceSS extends BaseSourceSS {
     }
 
     @Override
-    public JavaDStream<String> createStream() {
+    public JavaDStream<String> createStream(JavaStreamingContext streamingContext) {
         return context.textFileStream(sourcePath);
     }
 

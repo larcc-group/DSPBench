@@ -100,6 +100,8 @@ public class SparkStreamingRunner {
 
         config.setAppName(applicationName);
         config.setMaster(master);
+        config.set("spark.streaming.backpressure.enabled", "true");//todo add to config file
+        config.set("spark.streaming.kafka.maxRatePerPartition", "1000");//todo add to config file
 
         try {
             JavaStreamingContext context = app.getContextStreaming(applicationName, config);

@@ -16,6 +16,6 @@ public abstract class BaseSourceSS {
         this.config = config;
         this.context = context;
     }
-    public abstract JavaDStream<String> createStream();
+    public abstract JavaDStream<String> createStream(JavaStreamingContext streamingContext);
 }
 

@@ -10,10 +10,12 @@ import org.apache.spark.sql.streaming.DataStreamWriter;
 import org.apache.spark.sql.streaming.StreamingQuery;
 import org.apache.spark.sql.streaming.StreamingQueryException;
 import org.apache.spark.streaming.api.java.JavaDStream;
+import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import spark.streaming.constants.BaseConstants.BaseConfig;
 import spark.streaming.sink.BaseSink;
+import spark.streaming.sink.BaseSinkSS;
 import spark.streaming.source.BaseSource;
 import spark.streaming.source.BaseSourceSS;
 import spark.streaming.util.ClassLoaderUtils;
@@ -62,7 +64,7 @@ public abstract class AbstractApplication implements Serializable {
         String sourceClass = config.get(getConfigKey(BaseConfig.SOURCE_CLASS));
         BaseSourceSS source = (BaseSourceSS) ClassLoaderUtils.newInstance(sourceClass, "source", getLogger());
         source.initialize(config, context, getConfigPrefix());
-        return source.createStream();
+        return source.createStream(context);
     }
 
 
@@ -71,6 +73,12 @@ public abstract class AbstractApplication implements Serializable {
         BaseSink source = (BaseSink) ClassLoaderUtils.newInstance(sinkClass, "sink", getLogger());
         source.initialize(config, session);
         return source.sinkStream(dt); //config
+    }
+    protected void createSinkSS(JavaPairDStream<String, Integer> dt) {
+        String sinkClass = config.get(getConfigKey(BaseConfig.SINK_CLASS), "spark.streaming.sink.ConsoleSink");
+        BaseSinkSS source = (BaseSinkSS) ClassLoaderUtils.newInstance(sinkClass, "sink", getLogger());
+        source.initialize(config, session);
+        source.sinkStream(dt); //config
     }
 
     protected DataStreamWriter<Row> createSink() {

@@ -33,6 +33,7 @@ public class WordCountSS extends AbstractApplication {
     private int splitterThreads;
     private int singleCounterThreads;
     private int pairCounterThreads;
+    private int batchSize;
 
     public WordCountSS(String appName, Configuration config) {
         super(appName, config);
@@ -44,7 +45,7 @@ public class WordCountSS extends AbstractApplication {
         singleCounterThreads = config.getInt(WordCountConstants.Config.SINGLE_COUNTER_THREADS, 1);
         pairCounterThreads = config.getInt(WordCountConstants.Config.PAIR_COUNTER_THREADS, 1);
         parserThreads = config.getInt(WordCountConstants.Config.PARSER_THREADS, 1);
-       // batchSize            = config.getInt(getConfigKey(Config.BATCH_SIZE), 1000);
+        batchSize            = config.getInt(getConfigKey(WordCountConstants.Config.BATCH_SIZE), 1000);
     }
 
     @Override
@@ -55,26 +56,17 @@ public class WordCountSS extends AbstractApplication {
     @Override
     public JavaStreamingContext buildApplicationStreaming() {
 
-        context = new JavaStreamingContext(config, Durations.seconds(10)); //todo change for conf file
+        context = new JavaStreamingContext(config, Durations.milliseconds(batchSize)); //todo change for conf file
 
         JavaDStream<String> lines  = createSourceSS();//context.socketTextStream("localhost", 9999);//
 
-        JavaDStream<String> words = lines.flatMap(x -> Arrays.asList(x.split(" ")).iterator());
+        JavaDStream<String> words = lines.repartition(splitterThreads).flatMap(x -> Arrays.asList(x.split(" ")).iterator());
 
+        JavaPairDStream<String, Integer> pairs = words.repartition(singleCounterThreads).mapToPair(s -> new Tuple2<>(s, 1));
 
-        JavaPairDStream<String, Integer> pairs = words.mapToPair(s -> new Tuple2<>(s, 1));
+        JavaPairDStream<String, Integer> wordCounts = pairs.repartition(pairCounterThreads).reduceByKey((i1, i2) -> i1 + i2);
 
-
-        JavaPairDStream<String, Integer> wordCounts = pairs.reduceByKey((i1, i2) -> i1 + i2);
-
-        //wordCounts.print();
-
-        wordCounts.foreachRDD(rdd -> {
-            rdd.foreach(record -> {
-                System.out.println(record);
-       //         incReceived();
-            });
-        });
+        createSinkSS(wordCounts);
 
         return context;
     }
