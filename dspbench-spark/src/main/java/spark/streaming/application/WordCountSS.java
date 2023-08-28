@@ -56,9 +56,11 @@ public class WordCountSS extends AbstractApplication {
     @Override
     public JavaStreamingContext buildApplicationStreaming() {
 
+        config.set("backpressure.enabled", "true");//todo add to config file
+        config.set("kafka.maxRatePerPartition", "1000");//todo add to config file
         context = new JavaStreamingContext(config, Durations.milliseconds(batchSize)); //todo change for conf file
 
-        JavaDStream<String> lines  = createSourceSS();//context.socketTextStream("localhost", 9999);//
+        JavaDStream<String> lines  = createSourceSS();
 
         JavaDStream<String> words = lines.repartition(splitterThreads).flatMap(x -> Arrays.asList(x.split(" ")).iterator());
 
