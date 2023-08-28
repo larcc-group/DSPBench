@@ -1,0 +1,2 @@
+Deploying to 
+metrics.reporter=csv,wc.source.path=/home/luan/Documents/repositorios/DSPBench/dspbench-spark/data/wordcount,wc.parser.threads=1,metrics.enabled=true,metrics.output=/home/metrics/,wc.kafka.source.topic=books2,metrics.interval=1,wc.kafka.zookeeper.host=192.168.20.204:9092,wc.batch.size=1000,wc.source.class=spark.streaming.source.KafkaSourceSS,wc.source.threads=1,wc.sink.class=spark.streaming.sink.ConsoleSinkSS,metrics.interval.unit=seconds

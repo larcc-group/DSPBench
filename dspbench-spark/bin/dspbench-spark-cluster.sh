@@ -28,4 +28,4 @@ function readProperty() {
 echo "Deploying to $PLATFORM"
 echo "$APP_CONFIG_STR"
 
-spark-submit  --class spark.streaming.StruturedStreamingRunner  --master yarn   --deploy-mode cluster   --executor-memory 6500M  --num-executors 3  --executor-cores 3  $JAR_PATH -m yarn -a $APP_NAME --config $APP_CONFIG_STR
+spark-submit  --class spark.streaming.SparkStreamingRunner  --master yarn   --deploy-mode cluster   --executor-memory 2500M  --num-executors 3  --executor-cores 3  $JAR_PATH -m yarn -a $APP_NAME -r 300 --config $APP_CONFIG_STR

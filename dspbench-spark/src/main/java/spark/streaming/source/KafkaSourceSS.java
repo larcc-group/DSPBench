@@ -37,7 +37,7 @@ public class KafkaSourceSS extends BaseSourceSS {
         kafkaParams.put("bootstrap.servers", kafkaHost);
         kafkaParams.put("key.deserializer", StringDeserializer.class);
         kafkaParams.put("value.deserializer", StringDeserializer.class);
-       // kafkaParams.put("group.id", "use_a_separate_group_id_for_each_stream");
+        kafkaParams.put("group.id", UUID.randomUUID().toString());
         kafkaParams.put("auto.offset.reset", "earliest");
         kafkaParams.put("enable.auto.commit", false);
 
