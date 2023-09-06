@@ -27,25 +27,7 @@ public abstract class BaseSinkSS implements Serializable {
         this.config = config;
         this.session = session;
         this.sinkName = sinkName;
-        if (config.getBoolean(config.METRICS_ENABLED, false)) {
-          /*  File pathLa = Paths.get(config.get(Configuration.METRICS_OUTPUT), "latency").toFile();
-            File pathTrh = Paths.get(config.get(Configuration.METRICS_OUTPUT), "throughput").toFile();
-
-            pathLa.mkdirs();
-            pathTrh.mkdirs();
-            queue = new ArrayBlockingQueue<>(50);
-
-            this.file = Paths.get(config.get(Configuration.METRICS_OUTPUT), "throughput", this.getClass().getSimpleName() + ".csv").toFile();*/
-        }
     }
-
-//    public Configuration getConfiguration() {
-//        if (config == null) {
-//            config = Configuration.fromStr(configStr);
-//        }
-//
-//        return config;
-//    }
 
     public abstract void sinkStream(JavaPairDStream<String, Integer> dt); //Configuration conf
 
@@ -98,58 +80,4 @@ public abstract class BaseSinkSS implements Serializable {
     public String getName() {
         return sinkName;
     }
-
-
-   /* public void calculateLatency(long UnixTimeInit) {
-        // new Thread(() -> {
-        if (config.getBoolean(Configuration.METRICS_ENABLED, false)) {
-            try {
-                FileWriter fw = new FileWriter(Paths.get(config.get(Configuration.METRICS_OUTPUT), "latency", this.getClass().getSimpleName() + this.sinkName + ".csv").toFile(), true);
-                fw.write(Instant.now().toEpochMilli() - UnixTimeInit + System.getProperty("line.separator"));
-                fw.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        //  }).start();
-    }
-
-    public Tuple2<Map<String, Long>, BlockingQueue<String>> calculateThroughput(Map<String, Long> throughput, BlockingQueue<String> queue) {
-        if (config.getBoolean(Configuration.METRICS_ENABLED, false)) {
-            long unixTime;
-            if (config.get(Configuration.METRICS_INTERVAL_UNIT).equals("seconds")) {
-                unixTime = Instant.now().getEpochSecond();
-            } else {
-                unixTime = Instant.now().toEpochMilli();
-            }
-
-            Long ops = throughput.get(unixTime + "");
-            if (ops == null) {
-                for (Map.Entry<String, Long> entry : throughput.entrySet()) {
-                    queue.add(entry.getKey() + "," + entry.getValue() + System.getProperty("line.separator"));
-                }
-                throughput.clear();
-            }
-
-            ops = (ops == null) ? 1L : ++ops;
-
-            throughput.put(unixTime + "", ops);
-        }
-        return new Tuple2<>(throughput, queue);
-    }
-
-
-    public void SaveMetrics(String met) {
-        new Thread(() -> {
-            try {
-                try (Writer writer = new FileWriter(this.file, true)) {
-                    writer.append(met);
-                } catch (IOException ex) {
-                    LOG.error("Error while writing the file " + this.file, ex);
-                }
-            } catch (Exception e) {
-                LOG.error("Error while creating the file " + e.getMessage());
-            }
-        }).start();
-    }*/
 }

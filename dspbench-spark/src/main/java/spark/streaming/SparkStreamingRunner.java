@@ -36,7 +36,7 @@ public class SparkStreamingRunner {
     public List<String> parameters = Lists.newArrayList();
 
     @Parameter(names = {"-m", "--master"}, description = "Cluster URL for Spark, Mesos or YARN")
-    public String master = "local[2]";
+    public String master = "local[1]";
 
     @Parameter(names = {"-a", "--app"}, description = "The application to be executed", required = true)
     public String application;
@@ -101,9 +101,9 @@ public class SparkStreamingRunner {
         config.setAppName(applicationName);
         config.setMaster(master);
         config.set("spark.streaming.backpressure.enabled", "true");//todo add to config file
-        config.set("spark.streaming.kafka.maxRatePerPartition", "1000");//todo add to config file
+        config.set("spark.streaming.kafka.maxRatePerPartition", "1000000");//todo add to config file
         config.set("backpressure.enabled", "true");//todo add to config file
-        config.set("kafka.maxRatePerPartition", "1000");//todo add to config file
+        config.set("kafka.maxRatePerPartition", "1000000");//todo add to config file
 
         try {
             JavaStreamingContext context = app.getContextStreaming(applicationName, config);

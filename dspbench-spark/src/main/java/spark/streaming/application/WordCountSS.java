@@ -17,10 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 import spark.streaming.constants.WordCountConstants;
-import spark.streaming.function.SSFilterNull;
-import spark.streaming.function.SSWordCount;
-import spark.streaming.function.SSWordcountParser;
-import spark.streaming.function.Split;
+import spark.streaming.function.*;
 import spark.streaming.util.Configuration;
 import spark.streaming.util.Tuple;
 
@@ -57,12 +54,12 @@ public class WordCountSS extends AbstractApplication {
     public JavaStreamingContext buildApplicationStreaming() {
 
         config.set("backpressure.enabled", "true");//todo add to config file
-        config.set("kafka.maxRatePerPartition", "1000");//todo add to config file
+        config.set("kafka.maxRatePerPartition", "1000000");//todo add to config file
         context = new JavaStreamingContext(config, Durations.milliseconds(batchSize)); //todo change for conf file
 
         JavaDStream<String> lines  = createSourceSS();
 
-        JavaDStream<String> words = lines.repartition(splitterThreads).flatMap(x -> Arrays.asList(x.split(" ")).iterator());
+        JavaDStream<String> words = lines.repartition(splitterThreads).flatMap(new WordcountParser(config)).flatMap(x -> Arrays.asList(x.split(" ")).iterator());
 
         JavaPairDStream<String, Integer> pairs = words.repartition(singleCounterThreads).mapToPair(s -> new Tuple2<>(s, 1));
 
