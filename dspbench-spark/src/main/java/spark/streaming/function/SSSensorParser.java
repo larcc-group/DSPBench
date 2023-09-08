@@ -41,11 +41,6 @@ public class SSSensorParser extends BaseFunction implements MapFunction<String, 
     private static final int HUMID_FIELD = 5;
     private static final int LIGHT_FIELD = 6;
     private static final int VOLT_FIELD = 7;
-    private static Map<String, Long> throughput = new HashMap<>();
-
-    private static BlockingQueue<String> queue= new ArrayBlockingQueue<>(20);
-
-
     private static final ImmutableMap<String, Integer> fieldList = ImmutableMap.<String, Integer>builder()
             .put("temp", TEMP_FIELD)
             .put("humid", HUMID_FIELD)
@@ -73,8 +68,7 @@ public class SSSensorParser extends BaseFunction implements MapFunction<String, 
 
     @Override
     public Row call(String value) throws Exception {
-        Calculate();
-        incReceived();
+    //    incReceived();
         String[] fields = value.split("\\s+");
 
         if (fields.length != 8)
@@ -95,7 +89,7 @@ public class SSSensorParser extends BaseFunction implements MapFunction<String, 
         }
 
         try {
-            incEmitted();
+         //   incEmitted();
             return RowFactory.create(Integer.parseInt(fields[MOTEID_FIELD]),
                     date.toDate(),
                     Double.parseDouble(fields[valueFieldKey]));

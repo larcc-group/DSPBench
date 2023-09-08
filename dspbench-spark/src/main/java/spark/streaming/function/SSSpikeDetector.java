@@ -20,18 +20,15 @@ import java.util.concurrent.BlockingQueue;
 public class SSSpikeDetector extends BaseFunction implements MapFunction<Row, Row> {
     private static final Logger LOG = LoggerFactory.getLogger(SSSpikeDetector.class);
     private double spikeThreshold;
-    private static Map<String, Long> throughput = new HashMap<>();
-
-    private static BlockingQueue<String> queue = new ArrayBlockingQueue<>(20);
 
     @Override
     public void Calculate() throws InterruptedException {
-        Tuple2<Map<String, Long>, BlockingQueue<String>> d = super.calculateThroughput(throughput, queue);
+    /*    Tuple2<Map<String, Long>, BlockingQueue<String>> d = super.calculateThroughput(throughput, queue);
         throughput = d._1;
         queue = d._2;
         if (queue.size() >= 10) {
             super.SaveMetrics(queue.take());
-        }
+        }*/
     }
 
     public SSSpikeDetector(Configuration config) {
@@ -41,14 +38,11 @@ public class SSSpikeDetector extends BaseFunction implements MapFunction<Row, Ro
 
     @Override
     public Row call(Row value) throws Exception {
-        Calculate();
-        incReceived();
         int deviceID = value.getInt(0);
         double movingAverageInstant = value.getDouble(1);
         double nextDouble = value.getDouble(2);
 
         if (Math.abs(nextDouble - movingAverageInstant) > spikeThreshold * movingAverageInstant) {
-            incEmitted();
             return RowFactory.create(deviceID, movingAverageInstant, nextDouble, "spike detected");
         }
         return null;

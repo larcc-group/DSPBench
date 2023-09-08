@@ -33,12 +33,6 @@ public abstract class BaseFunction implements Serializable {
         this();
         this.configStr = config.toString();
         this.config = config;
-        if (config.getBoolean(config.METRICS_ENABLED, false)) {
-            File pathTrh = Paths.get(config.get(Configuration.METRICS_OUTPUT), "throughput").toFile();
-            pathTrh.mkdirs();
-
-           // this.file = Paths.get(config.get(Configuration.METRICS_OUTPUT), "throughput", this.getClass().getSimpleName() + ".csv").toFile();
-        }
     }
 
     public BaseFunction(Configuration config, String name) {
@@ -151,7 +145,7 @@ public abstract class BaseFunction implements Serializable {
 
 
     public void SaveMetrics(String met) {
-        new Thread(() -> {
+      /*  new Thread(() -> {
             try {
                 try (Writer writer = new FileWriter(this.file, true)) {
                     writer.append(met);
@@ -161,6 +155,6 @@ public abstract class BaseFunction implements Serializable {
             } catch (Exception e) {
                 LOG.error("Error while creating the file " + e.getMessage());
             }
-        }).start();
+        }).start();*/
     }
 }

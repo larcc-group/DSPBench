@@ -41,8 +41,8 @@ public class SSFlatRepeatVisit extends BaseFunction implements FlatMapGroupsWith
         List<Row> tuples = new ArrayList<>();
         Row tuple;
         while (values.hasNext()) {
-            Calculate();
-            incBoth();
+          //  Calculate();
+        //  //  incBoth();
             tuple = values.next();
             if (!state.exists()) {
                 tuples.add(RowFactory.create(tuple.get(2), tuple.get(1), Boolean.TRUE, tuple.get(tuple.size() - 1)));

@@ -45,7 +45,7 @@ public class SSVisitStats extends BaseFunction implements FlatMapGroupsWithState
         Row tuple;
         List<Row> tuples = new ArrayList<>();
         while (values.hasNext()) {
-            incBoth();
+          //  incBoth();
             tuple = values.next();
             if (!state.exists()) {
                 stats = new VisitStats();

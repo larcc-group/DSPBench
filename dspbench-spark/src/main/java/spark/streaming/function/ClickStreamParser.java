@@ -42,11 +42,11 @@ public class ClickStreamParser extends BaseFunction implements MapFunction<Strin
 
     @Override
     public Row call(String value) throws Exception {
-        Calculate();
-        incReceived();
+      //  Calculate();
+      //  incReceived();
         try {
             ClickStream clickstream = new Gson().fromJson(value, ClickStream.class);
-            incEmitted();
+          //  incEmitted();
             return RowFactory.create(clickstream.ip,
                     clickstream.url,
                     clickstream.clientKey);

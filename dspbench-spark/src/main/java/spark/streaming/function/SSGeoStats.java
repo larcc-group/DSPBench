@@ -44,7 +44,7 @@ public class SSGeoStats extends BaseFunction implements FlatMapGroupsWithStateFu
         String city;
         Row value;
         while (values.hasNext()) {
-            incBoth();
+           // incBoth();
 
             value = values.next();
             city = value.getString(1);

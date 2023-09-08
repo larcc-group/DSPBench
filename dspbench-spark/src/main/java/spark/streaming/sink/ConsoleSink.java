@@ -79,6 +79,6 @@ public class ConsoleSink extends BaseSink {
                         // Close the connection
                     }
                 }).outputMode(config.get(BaseConstants.BaseConfig.OUTPUT_MODE, "update"))
-                .trigger(Trigger.AvailableNow());
+                .trigger(Trigger.ProcessingTime(1000));
     }
 }

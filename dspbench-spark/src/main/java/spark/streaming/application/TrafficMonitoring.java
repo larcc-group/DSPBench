@@ -13,10 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.streaming.constants.TrafficMonitoringConstants;
 import spark.streaming.constants.WordCountConstants;
-import spark.streaming.function.SSBeijingTaxiTraceParser;
-import spark.streaming.function.SSFilterNull;
-import spark.streaming.function.SSMapMatcher;
-import spark.streaming.function.SSSpeedCalculator;
+import spark.streaming.function.*;
 import spark.streaming.model.gis.Road;
 import spark.streaming.util.Configuration;
 import org.apache.spark.sql.types.DataTypes;
@@ -25,6 +22,7 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import spark.streaming.util.Tuple;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,7 +53,7 @@ public class TrafficMonitoring extends AbstractApplication {
                 new StructField("lon", DataTypes.DoubleType, true, Metadata.empty()),
                 new StructField("speed", DataTypes.IntegerType, true, Metadata.empty()),
                 new StructField("bearing", DataTypes.IntegerType, true, Metadata.empty()),
-                new StructField("inittime", DataTypes.LongType, false, Metadata.empty())
+                new StructField("inittime", DataTypes.LongType, true, Metadata.empty())
         });
 
         Dataset<Row> rawRecords = createSource();
@@ -65,11 +63,11 @@ public class TrafficMonitoring extends AbstractApplication {
                 .as(Encoders.STRING())
                 .map(new SSBeijingTaxiTraceParser(config), RowEncoder.apply(schema));
 
-        KeyValueGroupedDataset<Integer, Row> roads = records.filter(new SSFilterNull<>())
+       KeyValueGroupedDataset<Integer, Row> roads = records.filter(new SSFilterNull<>())
                 .repartition(mapMatcherThreads)
                 .groupByKey(new SSMapMatcher(config), Encoders.INT());
 
-        Dataset<Row> speed = roads
+     Dataset<Row> speed = roads
                 .mapGroupsWithState(new SSSpeedCalculator(config), Encoders.kryo(Road.class), Encoders.kryo(Row.class), GroupStateTimeout.NoTimeout())
                 .repartition(speedCalculatorThreads);
 

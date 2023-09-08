@@ -2,9 +2,9 @@ package spark.streaming.function;
 
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.RowFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 import spark.streaming.constants.TrafficMonitoringConstants.Config;
 import spark.streaming.model.gis.GPSRecord;
 import spark.streaming.model.gis.RoadGridList;
@@ -12,24 +12,30 @@ import spark.streaming.util.Configuration;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+
 /**
  *
  * @author luandopke
  */
-public class SSMapMatcher extends BaseFunction implements MapFunction<Row, Integer> {
-    private static final Logger LOG = LoggerFactory.getLogger(SSMapMatcher.class);
+public class SSMapMatcher2 extends BaseFunction implements MapFunction<Row, Row> {
+    private static final Logger LOG = LoggerFactory.getLogger(SSMapMatcher2.class);
 
     private transient RoadGridList sectors;
     private double latMin;
     private double latMax;
     private double lonMin;
     private double lonMax;
+    private static Map<String, Long> throughput = new HashMap<>();
 
-    public SSMapMatcher(Configuration config) {
+    private static BlockingQueue<String> queue= new ArrayBlockingQueue<>(20);
+
+
+    public SSMapMatcher2(Configuration config) {
         super(config);
         
         loadShapefile(config);
@@ -73,7 +79,7 @@ public class SSMapMatcher extends BaseFunction implements MapFunction<Row, Integ
     }
 
     @Override
-    public Integer call(Row input) throws Exception {
+    public Row call(Row input) throws Exception {
         Calculate();
         RoadGridList gridList = getSectors();
 
@@ -83,20 +89,20 @@ public class SSMapMatcher extends BaseFunction implements MapFunction<Row, Integ
             double latitude  = input.getDouble(3);
             double longitude = input.getDouble(4);
 
-            if (speed <= 0) return 0;
-            if (longitude > lonMax || longitude < lonMin || latitude > latMax || latitude < latMin) return 0;
+            if (speed <= 0) return null;
+            if (longitude > lonMax || longitude < lonMin || latitude > latMax || latitude < latMin) return null;
 
             GPSRecord record = new GPSRecord(longitude, latitude, speed, bearing);
 
             int roadID = gridList.fetchRoadID(record);
 
             if (roadID != -1) {
-                return roadID;
+                return RowFactory.create(input, roadID);
             }
         } catch (SQLException ex) {
             LOG.error("Unable to fetch road ID", ex);
         }
 
-        return 0;
+        return RowFactory.create();
     }
 }

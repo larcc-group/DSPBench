@@ -22,9 +22,6 @@ import java.util.concurrent.BlockingQueue;
  */
 public class SSFlatMovingAverage extends BaseFunction implements FlatMapGroupsWithStateFunction<Integer, Row, Moving, Row> {
     private int movingAverageWindow;
-    private static Map<String, Long> throughput = new HashMap<>();
-
-    private static BlockingQueue<String> queue= new ArrayBlockingQueue<>(20);
 
     public SSFlatMovingAverage(Configuration config) {
         super(config);
@@ -49,8 +46,8 @@ public class SSFlatMovingAverage extends BaseFunction implements FlatMapGroupsWi
         Moving mov;
         Row tuple;
         while (values.hasNext()) {
-            Calculate();
-            incBoth();
+           // Calculate();
+       //     incBoth();
             tuple = values.next();
             value = tuple.getDouble(2);
             avg = value;
