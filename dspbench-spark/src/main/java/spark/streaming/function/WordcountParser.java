@@ -26,10 +26,6 @@ import spark.streaming.util.Tuple;
  * @author luandopke
  */
 public class WordcountParser extends BaseFunction implements FlatMapFunction<String, String> {
-    private static final Logger LOG = LoggerFactory.getLogger(WordcountParser.class);
-    private static Map<String, Long> throughput = new HashMap<>();
-
-    private static BlockingQueue<String> queue= new ArrayBlockingQueue<>(20);
 
     @Override
     public void Calculate() throws InterruptedException {

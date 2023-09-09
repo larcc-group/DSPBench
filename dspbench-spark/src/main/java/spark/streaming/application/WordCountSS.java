@@ -59,7 +59,9 @@ public class WordCountSS extends AbstractApplication {
 
         JavaDStream<String> lines  = createSourceSS();
 
-        JavaDStream<String> words = lines.repartition(splitterThreads).flatMap(new WordcountParser(config)).flatMap(x -> Arrays.asList(x.split(" ")).iterator());
+        JavaDStream<String> words = lines.repartition(splitterThreads)
+            //    .flatMap(new WordcountParser(config))
+                .flatMap(x -> Arrays.asList(x.split(" ")).iterator());
 
         JavaPairDStream<String, Integer> pairs = words.repartition(singleCounterThreads).mapToPair(s -> new Tuple2<>(s, 1));
 

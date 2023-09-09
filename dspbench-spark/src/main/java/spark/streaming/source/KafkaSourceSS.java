@@ -33,9 +33,9 @@ public class KafkaSourceSS extends BaseSourceSS {
     }
     @Override
     public JavaDStream<String> createStream( JavaStreamingContext streamingContext) {
+      /*  streamingContext.sparkContext().getConf().set("backpressure.enabled", "true");
         streamingContext.sparkContext().getConf().set("backpressure.enabled", "true");
-        streamingContext.sparkContext().getConf().set("backpressure.enabled", "true");
-        streamingContext.sparkContext().getConf().set("kafka.maxRatePerPartition", "1000");
+        streamingContext.sparkContext().getConf().set("kafka.maxRatePerPartition", "1000");*/
         Map<String, Object> kafkaParams = new HashMap<>();
         kafkaParams.put("bootstrap.servers", kafkaHost);
         kafkaParams.put("key.deserializer", StringDeserializer.class);

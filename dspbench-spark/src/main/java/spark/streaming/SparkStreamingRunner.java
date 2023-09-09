@@ -61,7 +61,7 @@ public class SparkStreamingRunner {
         driver.addApp("trafficmonitoring", TrafficMonitoring.class);
         driver.addApp("sentimentanalysis", SentimentAnalysis.class);
         driver.addApp("frauddetection", FraudDetection.class);
-        driver.addApp("spikedetection", SpikeDetection.class);
+        driver.addApp("spikedetection", SpikeDetectionSS.class);
         driver.addApp("clickanalytics", ClickAnalytics.class);
         driver.addApp("machineoutlier", MachineOutlier.class);
         driver.addApp("logprocessing", LogProcessing.class);
@@ -100,10 +100,10 @@ public class SparkStreamingRunner {
 
         config.setAppName(applicationName);
         config.setMaster(master);
-        config.set("spark.streaming.backpressure.enabled", "true");//todo add to config file
-        config.set("spark.streaming.kafka.maxRatePerPartition", "1000000");//todo add to config file
+      /*  config.set("spark.streaming.backpressure.enabled", "true");//todo add to config file
+        config.set("spark.streaming.kafka.maxRatePerPartition", "1000");//todo add to config file
         config.set("backpressure.enabled", "true");//todo add to config file
-        config.set("kafka.maxRatePerPartition", "1000000");//todo add to config file
+        config.set("kafka.maxRatePerPartition", "1000");//todo add to config file*/
 
         try {
             JavaStreamingContext context = app.getContextStreaming(applicationName, config);
@@ -115,6 +115,7 @@ public class SparkStreamingRunner {
             } else {
                 context.awaitTermination();
             }
+            context.stop();
         }catch (Exception ex){
             throw new Exception(ex.getMessage());
         }

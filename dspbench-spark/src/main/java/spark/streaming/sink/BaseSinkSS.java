@@ -6,9 +6,11 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.streaming.DataStreamWriter;
+import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
 import spark.streaming.metrics.MetricsFactory;
 import spark.streaming.util.Configuration;
+import spark.streaming.util.Tuple;
 
 import java.io.Serializable;
 
@@ -30,7 +32,7 @@ public abstract class BaseSinkSS implements Serializable {
     }
 
     public abstract void sinkStream(JavaPairDStream<String, Integer> dt); //Configuration conf
-
+    public abstract void sinkStream2(JavaDStream<Tuple> dt);
     protected MetricRegistry getMetrics() {
         if (metrics == null) {
             metrics = MetricsFactory.createRegistry(this.config);

@@ -11,5 +11,7 @@ public interface WordCountConstants extends BaseConstants {
         String SPLITTER_THREADS       = "wc.splitter.threads";
         String SINGLE_COUNTER_THREADS = "wc.single_counter.threads";
         String PAIR_COUNTER_THREADS   = "wc.pair_counter.threads";
+
+        String maxRatePerPartition   = "kafka.maxRatePerPartition";
     }
 }

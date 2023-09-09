@@ -20,6 +20,7 @@ import spark.streaming.source.BaseSource;
 import spark.streaming.source.BaseSourceSS;
 import spark.streaming.util.ClassLoaderUtils;
 import spark.streaming.util.Configuration;
+import spark.streaming.util.Tuple;
 
 /**
  * @author mayconbordin
@@ -79,6 +80,12 @@ public abstract class AbstractApplication implements Serializable {
         BaseSinkSS source = (BaseSinkSS) ClassLoaderUtils.newInstance(sinkClass, "sink", getLogger());
         source.initialize(config, session);
         source.sinkStream(dt); //config
+    }
+    protected void createSinkSS2(JavaDStream<Tuple> dt) {
+        String sinkClass = config.get(getConfigKey(BaseConfig.SINK_CLASS), "spark.streaming.sink.ConsoleSink");
+        BaseSinkSS source = (BaseSinkSS) ClassLoaderUtils.newInstance(sinkClass, "sink", getLogger());
+        source.initialize(config, session);
+        source.sinkStream2(dt); //config
     }
 
     protected DataStreamWriter<Row> createSink() {
