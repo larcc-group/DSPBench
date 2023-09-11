@@ -19,7 +19,7 @@ import java.util.concurrent.BlockingQueue;
 /**
  * @author luandopke
  */
-public class SpikeDetector extends BaseFunction implements Function<Tuple2<Integer, Tuple>, Tuple> {
+public class SpikeDetector extends BaseFunction implements Function<Tuple, Tuple> {
     private double spikeThreshold;
 
     @Override
@@ -32,12 +32,28 @@ public class SpikeDetector extends BaseFunction implements Function<Tuple2<Integ
         spikeThreshold = config.getDouble(SpikeDetectionConstants.Config.SPIKE_DETECTOR_THRESHOLD, 0.03d);
     }
 
-    @Override
+   /* @Override
     public Tuple call(Tuple2<Integer, Tuple> value) throws Exception {
         Tuple tuple = value._2;
         int deviceID = tuple.getInt("id");
         double movingAverageInstant = tuple.getDouble("avg");
         double nextDouble = tuple.getDouble("value");
+
+        if (Math.abs(nextDouble - movingAverageInstant) > spikeThreshold * movingAverageInstant) {
+            Tuple t = new Tuple();
+            t.set("deviceID", deviceID);
+            t.set("avg", movingAverageInstant);
+            t.set("value", nextDouble);
+            return t;
+        }
+        return null;
+    }*/
+
+    @Override
+    public Tuple call(Tuple value) throws Exception {
+        int deviceID = value.getInt("id");
+        double movingAverageInstant = value.getDouble("avg");
+        double nextDouble = value.getDouble("value");
 
         if (Math.abs(nextDouble - movingAverageInstant) > spikeThreshold * movingAverageInstant) {
             Tuple t = new Tuple();

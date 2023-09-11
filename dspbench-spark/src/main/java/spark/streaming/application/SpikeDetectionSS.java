@@ -2,6 +2,7 @@ package spark.streaming.application;
 
 import org.apache.spark.api.java.Optional;
 import org.apache.spark.api.java.function.Function2;
+import org.apache.spark.api.java.function.Function3;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -10,7 +11,10 @@ import org.apache.spark.sql.streaming.DataStreamWriter;
 import org.apache.spark.sql.streaming.GroupStateTimeout;
 import org.apache.spark.sql.streaming.OutputMode;
 import org.apache.spark.streaming.Durations;
+import org.apache.spark.streaming.State;
+import org.apache.spark.streaming.StateSpec;
 import org.apache.spark.streaming.api.java.JavaDStream;
+import org.apache.spark.streaming.api.java.JavaMapWithStateDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
@@ -63,10 +67,10 @@ public class SpikeDetectionSS extends AbstractApplication {
                 .repartition(parserThreads)
                 .map(new SensorParser(config));
 
-        JavaPairDStream<Integer, Tuple> averages = records.filter(new FilterNull<Tuple>())
+        JavaMapWithStateDStream<Integer, Tuple, Moving, Tuple> averages = records.filter(new FilterNull<Tuple>())
                 .repartition(movingAverageThreads)
                 .mapToPair(f -> new Tuple2<Integer, Tuple>(f.getInt("MOTEID"), f))
-                .updateStateByKey(new MovingAverage(config), movingAverageThreads);
+                .mapWithState(StateSpec.function(new MovingAverage(config)));
 
         JavaDStream<Tuple> spikes = averages
                 .repartition(spikeDetectorThreads)
