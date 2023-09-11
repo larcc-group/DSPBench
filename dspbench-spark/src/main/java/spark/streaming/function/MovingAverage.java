@@ -40,10 +40,6 @@ public class MovingAverage extends BaseFunction implements  Function2<List<Tuple
     public Optional<Tuple> call(List<Tuple> values, Optional<Tuple> state) throws Exception {
         Tuple newState = state.orElse(new Tuple(values));
 
-        if (newState.get("MOTEID") == null && values.size() > 0) {
-            newState.set(values.get(0).getInt("MOTEID") + "", values.get(0).get("MOTEID"));
-        }
-
         for (Tuple value : values) {
             updateTuple(newState, value, values.get(0).getInt("MOTEID"));
         }

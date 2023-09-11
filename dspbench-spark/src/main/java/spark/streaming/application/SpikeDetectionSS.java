@@ -54,8 +54,7 @@ public class SpikeDetectionSS extends AbstractApplication {
 
     @Override
     public JavaStreamingContext buildApplicationStreaming() {
-        config.set("backpressure.enabled", "true");//todo add to config file
-        config.set("kafka.maxRatePerPartition", maxRatePerPartition  +"");//todo add to config file
+
         context = new JavaStreamingContext(config, Durations.milliseconds(batchSize));
         context.checkpoint(checkpointPath);
 
