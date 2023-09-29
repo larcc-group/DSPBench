@@ -38,24 +38,17 @@ public class WordCount extends AbstractApplication {
     @Override
     public DataStreamWriter<Row> buildApplication() {
 
-      /*  config.set("spark.sql.cbo.enabled","true");//todo add to config file
-        config.set("cbo.enabled", "true");//todo add to config file
-
-        this.session.conf().set("spark.sql.cbo.enabled",true);
-        this.session.conf().set("cbo.enabled", true);
-        this.session.conf().set("adaptive.enabled", true);*/
         Dataset<Row> lines = createSource();
 
-    /*    Dataset<Row> records = lines
+        Dataset<Row> words = lines
                 .repartition(parserThreads)
                 .as(Encoders.STRING())
                 .map(new SSWordcountParser(config), Encoders.kryo(Row.class));
-*/
-        Dataset<String> words = lines.repartition(splitterThreads)
-                .as(Encoders.STRING())
-                .flatMap((FlatMapFunction<String, String>) x -> Arrays.asList(x.split(" ")).iterator(), Encoders.STRING());
 
-        Dataset<Row> wordCounts = words.repartition(pairCounterThreads).groupBy("value").count();
+        Dataset<Row> wordCounts = words
+                .repartition(pairCounterThreads)
+                .groupByKey((MapFunction<Row, String>) row -> row.getString(0), Encoders.STRING())
+                .mapGroupsWithState(new SSWordCount(config), Encoders.LONG(), Encoders.kryo(Row.class), GroupStateTimeout.NoTimeout());
 
         return createSink(wordCounts);
     }
