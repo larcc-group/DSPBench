@@ -60,17 +60,18 @@ public class WordCountSS extends AbstractApplication {
         JavaDStream<String> lines  = createSourceSS();
 
         JavaDStream<String> words = lines.repartition(splitterThreads)
-                .flatMap(new WordcountParser(config));
-               // .flatMap(x -> Arrays.asList(x.split(" ")).iterator());
+                .map(new WordcountParser(config));
+               // .flatMap(x -> Arrays.asList(x.split("\\W")).iterator());
 
-     ///   JavaPairDStream<String, Integer> pairs = words.repartition(singleCounterThreads).mapToPair(s -> new Tuple2<>(s, 1));
+        JavaDStream<String> pairs = words.repartition(splitterThreads)
+                .filter(new FilterNull<String>())
+                .flatMap(x -> Arrays.asList(x.split("\\W")).iterator());
 
         //JavaPairDStream<String, Integer> wordCounts = pairs.repartition(pairCounterThreads).reduceByKey((i1, i2) -> i1 + i2);
 
-        JavaMapWithStateDStream<String, Integer, Integer, Tuple> wordCounts = words//.filter(new FilterNull<Tuple>())
-                .repartition(singleCounterThreads)
-                .mapToPair(f -> new Tuple2<String, Integer>(f, 1))
+        JavaMapWithStateDStream<String, Integer, Integer, Tuple> wordCounts = pairs//.filter(new FilterNull<Tuple>())
                 .repartition(pairCounterThreads)
+                .mapToPair(f -> new Tuple2<String, Integer>(f, 1))
                 .mapWithState(StateSpec.function(new CountWordPairs(config)));
 
         createSinkSS2(wordCounts);

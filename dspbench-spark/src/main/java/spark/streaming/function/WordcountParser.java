@@ -1,31 +1,18 @@
 package spark.streaming.function;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.RowFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import scala.Tuple2;
-import scala.collection.mutable.Iterable;
 import spark.streaming.util.Configuration;
 
-import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import scala.Tuple2;
-import spark.streaming.util.Configuration;
-import spark.streaming.util.Tuple;
 
 
 /**
  * @author luandopke
  */
-public class WordcountParser extends BaseFunction implements FlatMapFunction<String, String> {
+public class WordcountParser extends BaseFunction implements Function<String, String> {
 
     @Override
     public void Calculate() throws InterruptedException {
@@ -41,18 +28,11 @@ public class WordcountParser extends BaseFunction implements FlatMapFunction<Str
     }
 
     @Override
-    public Iterator<String> call(String input) {
-       // incReceived();
+    public String call(String input) {
 
-        List<String> words = new ArrayList<>();
+        if (StringUtils.isBlank(input))
+            return null;
 
-        for (String word : input.split("\\W")) {
-            if (!StringUtils.isBlank(word))
-                words.add(word);
-        }
-
-//        incEmitted(words.size());
-
-        return words.iterator();
+        return input;
     }
 }

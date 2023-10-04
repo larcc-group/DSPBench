@@ -25,7 +25,7 @@ public class CountWordPairs extends BaseFunction implements Function3<String, Op
 
     @Override
     public Tuple call(String key, Optional<Integer> count, State<Integer> state) {
-        Integer value = 1;
+        int value = 1;
         if (state.exists()) {
             value = state.get() + 1;
         }
