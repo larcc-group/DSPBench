@@ -29,10 +29,9 @@ public class SSWordcountParser extends BaseFunction implements MapFunction<Strin
 
     @Override
     public Row call(String input) throws Exception {
-       incReceived();
-      //  Calculate();
+        if (StringUtils.isBlank(input))
+            return null;
 
-      //  incEmitted();
         return RowFactory.create(input);
     }
 }

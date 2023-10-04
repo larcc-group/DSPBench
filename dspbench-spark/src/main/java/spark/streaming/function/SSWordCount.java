@@ -21,19 +21,8 @@ public class SSWordCount extends BaseFunction implements MapGroupsWithStateFunct
     public SSWordCount(Configuration config) {
         super(config);
     }
-
-    //private static Map<String, Long> throughput = new HashMap<>();
-
-    //private static BlockingQueue<String> queue = new ArrayBlockingQueue<>(20);
-
     @Override
     public void Calculate() throws InterruptedException {
-      /*  Tuple2<Map<String, Long>, BlockingQueue<String>> d = super.calculateThroughput(throughput, queue);
-        throughput = d._1;
-        queue = d._2;
-        if (queue.size() >= 1) {
-            super.SaveMetrics(queue.take());
-        }*/
     }
 
     @Override
@@ -47,9 +36,6 @@ public class SSWordCount extends BaseFunction implements MapGroupsWithStateFunct
             }
             count++;
             state.update(count);
-
-         //   Calculate();
-          //  incBoth();
         }
         return RowFactory.create(key, count);
     }
