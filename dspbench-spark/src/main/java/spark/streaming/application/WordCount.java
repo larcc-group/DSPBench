@@ -40,10 +40,14 @@ public class WordCount extends AbstractApplication {
 
         Dataset<Row> lines = createSource();
 
-        Dataset<Row> words = lines
+        Dataset<Row> records = lines
                 .repartition(parserThreads)
                 .as(Encoders.STRING())
                 .map(new SSWordcountParser(config), Encoders.kryo(Row.class));
+
+        Dataset<Row> words = records.repartition(splitterThreads)
+                .filter(new SSFilterNull<>())
+                .flatMap(new Split(config),  Encoders.kryo(Row.class));
 
         Dataset<Row> wordCounts = words
                 .repartition(pairCounterThreads)
