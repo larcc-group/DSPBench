@@ -1,6 +1,10 @@
 package spark.streaming.function;
 
+import org.apache.spark.api.java.Optional;
 import org.apache.spark.api.java.function.Function2;
+import org.apache.spark.api.java.function.Function3;
+import org.apache.spark.streaming.State;
+import spark.streaming.model.Moving;
 import spark.streaming.util.Configuration;
 import spark.streaming.util.Tuple;
 
@@ -8,7 +12,7 @@ import spark.streaming.util.Tuple;
  *
  * @author mayconbordin
  */
-public class CountWordPairs extends BaseFunction implements Function2<Tuple, Tuple, Tuple> {
+public class CountWordPairs extends BaseFunction implements Function3<String, Optional<Integer>, State<Integer>, Tuple> {
 
     public CountWordPairs(Configuration config) {
         super(config);
@@ -20,14 +24,15 @@ public class CountWordPairs extends BaseFunction implements Function2<Tuple, Tup
     }
 
     @Override
-    public Tuple call(Tuple tupleOne, Tuple tupleTwo) throws Exception {
-        incReceived(2);
-        
-        //long ts = (tupleOne.getCreatedAt() < tupleTwo.getCreatedAt()) ? tupleOne.getCreatedAt() : tupleTwo.getCreatedAt();
-        Tuple newTuple = new Tuple(tupleOne, tupleTwo);
-        newTuple.set("count", (long)tupleOne.get("count") + (long)tupleTwo.get("count"));
-        
-        incEmitted();
-        return newTuple;
+    public Tuple call(String key, Optional<Integer> count, State<Integer> state) {
+        Integer value = 1;
+        if (state.exists()) {
+            value = state.get() + 1;
+        }
+        state.update(value);
+        Tuple retTuple = new Tuple();
+        retTuple.set("word",key);
+        retTuple.set("count",value);
+        return retTuple;
     }
 }

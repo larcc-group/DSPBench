@@ -42,7 +42,7 @@ public class WordcountParser extends BaseFunction implements FlatMapFunction<Str
 
     @Override
     public Iterator<String> call(String input) {
-        incReceived();
+       // incReceived();
 
         List<String> words = new ArrayList<>();
 
@@ -51,7 +51,7 @@ public class WordcountParser extends BaseFunction implements FlatMapFunction<Str
                 words.add(word);
         }
 
-        incEmitted(words.size());
+//        incEmitted(words.size());
 
         return words.iterator();
     }
