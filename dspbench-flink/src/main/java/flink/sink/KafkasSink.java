@@ -58,7 +58,7 @@ public class KafkasSink extends BaseSink implements Serializable {
                             return null;
                         }
                         System.out.println("Serializing...");
-                        return objectMapper.writeValueAsBytes(element);
+                        return objectMapper.writeValueAsBytes(element.f0 + "," + Integer.toString(element.f1));
                     } catch (Exception e) {
                         throw new SerializationException("Error when serializing MessageDto to byte[]");
                     } 
