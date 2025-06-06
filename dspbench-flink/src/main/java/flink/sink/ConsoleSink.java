@@ -72,7 +72,7 @@ public class ConsoleSink extends BaseSink implements Serializable {
             public void invoke(Tuple4<Date, Integer, Integer, Integer> value, Context context)
                     throws Exception {
                 super.invoke(value, context);
-                // System.out.println(value);
+                //System.out.println(value);
                 calculate("0");
             }
         }).setParallelism(config.getInteger(TrafficMonitoringConstants.Conf.SINK_THREADS, 1));
@@ -302,7 +302,7 @@ public class ConsoleSink extends BaseSink implements Serializable {
     }
 
     @Override
-    public void createSinkCAStatus(DataStream<Tuple2<Integer, Integer>> input) {
+    public void createSinkCAVisit(DataStream<Tuple2<Integer, Integer>> input) {
         input.addSink(new RichSinkFunction<Tuple2<Integer, Integer>>() {
             @Override
             public void open(Configuration parameters) throws Exception {
@@ -405,7 +405,7 @@ public class ConsoleSink extends BaseSink implements Serializable {
             @Override
             public void invoke(Tuple2<String, String[]> value, Context context) throws Exception {
                 super.invoke(value, context);
-                // System.out.println(value);
+                System.out.println(value);
                 calculate("0");
             }
         }).setParallelism(config.getInteger(ReinforcementLearnerConstants.Conf.SINK_THREADS, 1));
