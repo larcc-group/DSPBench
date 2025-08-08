@@ -2,6 +2,7 @@ package flink.sink;
 
 import flink.application.YSB.Aggregate_Event;
 import flink.application.voipstream.CallDetailRecord;
+import flink.application.highprocessingtimevariance.HighProcessingTimeVarianceEvent;
 import flink.constants.BaseConstants;
 import flink.tools.Rankings;
 import flink.util.Metrics;
@@ -32,6 +33,9 @@ public abstract class BaseSink {
     protected abstract Logger getLogger();
 
     public void sinkStreamWC(DataStream<Tuple2<String, Integer>> dt) {
+    }
+
+    public void sinkStreamHPTV(DataStream<HighProcessingTimeVarianceEvent> input) {
     }
 
     public void sinkStreamTM(DataStream<Tuple4<Date, Integer, Integer, Integer>> dt) {
